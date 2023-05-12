@@ -1,30 +1,28 @@
-// Copyright (C) 2017-2020 gamevanilla. All rights reserved.
-// This code can only be used under the standard Unity Asset Store End User License Agreement,
-// a copy of which is available at http://unity3d.com/company/legal/as_terms.
 
-namespace GameVanilla.Game.Common
-{
-    /// <summary>
-    /// The base class used for the tiles in the visual editor.
-    /// </summary>
+    using System;
+    using GameVanilla.Game.Common;
+
+    public enum TileType
+    {
+        Block,
+        Booster
+    }
+    
+    [Serializable]
     public class LevelTile
     {
         public BlockerType blockerType;
+        public TileType TileType;
     }
 
-    /// <summary>
-    /// The class used for block tiles.
-    /// </summary>
+    [Serializable]
     public class BlockTile : LevelTile
     {
         public BlockType type;
     }
 
-    /// <summary>
-    /// The class used for booster tiles.
-    /// </summary>
+    [Serializable]
     public class BoosterTile : LevelTile
     {
         public BoosterType type;
     }
-}

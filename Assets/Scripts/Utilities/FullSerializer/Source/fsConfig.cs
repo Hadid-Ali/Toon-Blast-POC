@@ -15,7 +15,7 @@ namespace FullSerializer {
         /// If exceptions are allowed internally, then additional date formats
         /// can be deserialized. Note that the Full Serializer public API will
         /// *not* throw exceptions with this enabled; errors will still be
-        /// returned in a fsResult instance.
+        /// returned in a fsResult Instance.
         /// </summary>
         public static bool AllowInternalExceptions = true;
 
@@ -27,7 +27,7 @@ namespace FullSerializer {
     }
 
     /// <summary>
-    /// Enables some top-level customization of Full Serializer.
+    /// Enables some top-LevelData customization of Full Serializer.
     /// </summary>
     public class fsConfig {
         /// <summary>

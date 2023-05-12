@@ -21,7 +21,7 @@ namespace FullSerializer {
         public string MemberName;
 
         /// <summary>
-        /// Forward object serialization to an instance member. See class
+        /// Forward object serialization to an Instance member. See class
         /// comment.
         /// </summary>
         /// <param name="memberName">

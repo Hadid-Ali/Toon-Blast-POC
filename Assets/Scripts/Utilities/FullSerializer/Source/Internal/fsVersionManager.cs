@@ -54,7 +54,7 @@ namespace FullSerializer.Internal {
                             ancestors[i] = ancestorType.Value;
                         }
 
-                        // construct the actual versioned type instance
+                        // construct the actual versioned type Instance
                         fsVersionedType versionedType = new fsVersionedType {
                             Ancestors = ancestors,
                             VersionString = attr.VersionString,

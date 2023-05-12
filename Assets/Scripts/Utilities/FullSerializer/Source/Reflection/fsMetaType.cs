@@ -304,16 +304,16 @@ namespace FullSerializer {
         private bool? _isDefaultConstructorPublicCache;
 
         /// <summary>
-        /// Creates a new instance of the type that this metadata points back to.
+        /// Creates a new Instance of the type that this metadata points back to.
         /// If this type has a default constructor, then Activator.CreateInstance
         /// will be used to construct the type (or Array.CreateInstance if it an
         /// array). Otherwise, an uninitialized object created via
         /// FormatterServices.GetSafeUninitializedObject is used to construct the
-        /// instance.
+        /// Instance.
         /// </summary>
         public object CreateInstance() {
             if (ReflectedType.Resolve().IsInterface || ReflectedType.Resolve().IsAbstract) {
-                throw new Exception("Cannot create an instance of an interface or abstract type for " + ReflectedType);
+                throw new Exception("Cannot create an Instance of an interface or abstract type for " + ReflectedType);
             }
 
 #if !NO_UNITY
@@ -356,11 +356,11 @@ namespace FullSerializer {
             }
 #if (!UNITY_EDITOR && (UNITY_METRO)) == false
             catch (MissingMethodException e) {
-                throw new InvalidOperationException("Unable to create instance of " + ReflectedType + "; there is no default constructor", e);
+                throw new InvalidOperationException("Unable to create Instance of " + ReflectedType + "; there is no default constructor", e);
             }
 #endif
             catch (TargetInvocationException e) {
-                throw new InvalidOperationException("Constructor of " + ReflectedType + " threw an exception when creating an instance", e);
+                throw new InvalidOperationException("Constructor of " + ReflectedType + " threw an exception when creating an Instance", e);
             }
             catch (MemberAccessException e) {
                 throw new InvalidOperationException("Unable to access constructor of " + ReflectedType, e);

@@ -18,7 +18,7 @@ namespace FullSerializer.Internal {
         public Type ModelType;
 
         /// <summary>
-        /// Migrate from an instance of an ancestor.
+        /// Migrate from an Instance of an ancestor.
         /// </summary>
         public object Migrate(object ancestorInstance) {
             return Activator.CreateInstance(ModelType, ancestorInstance);

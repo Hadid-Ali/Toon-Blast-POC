@@ -10,7 +10,7 @@ using GameVanilla.Game.Common;
 namespace GameVanilla.Game.UI
 {
     /// <summary>
-    /// This class manages the in-game user interface for the level goals.
+    /// This class manages the in-game user interface for the LevelData goal.
     /// </summary>
     public class GoalUi : MonoBehaviour
     {
@@ -18,7 +18,7 @@ namespace GameVanilla.Game.UI
         public HorizontalLayoutGroup group;
 
         /// <summary>
-        /// Updates the state of the goals of the current level.
+        /// Updates the state of the goal of the current LevelData.
         /// </summary>
         /// <param name="state">The current game state.</param>
         public void UpdateGoals(GameState state)

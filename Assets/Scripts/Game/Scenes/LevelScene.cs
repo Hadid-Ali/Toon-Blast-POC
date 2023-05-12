@@ -13,7 +13,7 @@ using GameVanilla.Game.UI;
 namespace GameVanilla.Game.Scenes
 {
     /// <summary>
-    /// This class contains the logic associated to the level scene.
+    /// This class contains the logic associated to the LevelData scene.
     /// </summary>
     public class LevelScene : BaseScene
     {
@@ -82,18 +82,6 @@ namespace GameVanilla.Game.Scenes
             var targetPos = currentButton.transform.position + new Vector3(0, 0.75f, 0);
 
             LevelButton prevButton = null;
-            if (PuzzleMatchManager.instance.unlockedNextLevel)
-            {
-                foreach (var button in scrollView.GetComponentsInChildren<LevelButton>())
-                {
-                    if (button.numLevel != PuzzleMatchManager.instance.lastSelectedLevel)
-                    {
-                        continue;
-                    }
-                    prevButton = button;
-                    break;
-                }
-            }
 
             if (prevButton != null)
             {

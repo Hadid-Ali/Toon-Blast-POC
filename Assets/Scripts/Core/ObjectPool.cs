@@ -29,7 +29,7 @@ namespace GameVanilla.Core
         /// </summary>
         private void Awake()
         {
-            Assert.IsNotNull(prefab);
+            
         }
 
         /// <summary>
@@ -90,9 +90,9 @@ namespace GameVanilla.Core
         }
 
         /// <summary>
-        /// Creates a new instance of the pooled object type.
+        /// Creates a new Instance of the pooled object type.
         /// </summary>
-        /// <returns>A new instance of the pooled object type.</returns>
+        /// <returns>A new Instance of the pooled object type.</returns>
         private GameObject CreateInstance()
         {
             var obj = Instantiate(prefab);

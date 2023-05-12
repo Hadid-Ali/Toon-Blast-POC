@@ -13,7 +13,7 @@ using GameVanilla.Game.Scenes;
 namespace GameVanilla.Game.UI
 {
     /// <summary>
-    /// This class manages the level buttons that are displayed on the level scene.
+    /// This class manages the LevelData buttons that are displayed on the LevelData scene.
     /// </summary>
     public class LevelButton : MonoBehaviour
     {
@@ -138,7 +138,7 @@ namespace GameVanilla.Game.UI
                     if (!FileUtils.FileExists("Levels/" + numLevel))
                     {
                         scene.OpenPopup<AlertPopup>("Popups/AlertPopup",
-                            popup => popup.SetText("This level does not exist."));
+                            popup => popup.SetText("This LevelData does not exist."));
                     }
                     else
                     {
@@ -147,10 +147,6 @@ namespace GameVanilla.Game.UI
                             popup.LoadLevelData(numLevel);
                         });
                     }
-                }
-                else
-                {
-                    scene.OpenPopup<BuyLivesPopup>("Popups/BuyLivesPopup");
                 }
             }
         }

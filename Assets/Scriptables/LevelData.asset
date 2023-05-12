@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62fb85ff3dffb1c46be9244dc09424b9, type: 3}
+  m_Name: LevelData
+  m_EditorClassIdentifier: 
+  id: 1
+  width: 6
+  height: 6
+  tiles:
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 1
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 1
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 1
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 1
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  - blockerType: 0
+    TileType: 0
+  limitType: 0
+  limit: 1500
+  penalty: 0
+  goal:
+    score: 250
+  availableColors: 0000000001000000040000000200000005000000
+  score1: 100
+  score2: 150
+  score3: 250
+  awardBoostersWithRemainingMoves: 0
+  awardedBoosterType: 0
+  collectableChance: 0

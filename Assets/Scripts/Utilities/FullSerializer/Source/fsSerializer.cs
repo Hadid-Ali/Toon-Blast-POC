@@ -40,7 +40,7 @@ namespace FullSerializer {
         private static readonly string Key_ObjectDefinition = string.Format("{0}id", fsGlobalConfig.InternalFieldPrefix);
 
         /// <summary>
-        /// This specifies the actual type of an object (the instance type was
+        /// This specifies the actual type of an object (the Instance type was
         /// different from the field type).
         /// </summary>
         private static readonly string Key_InstanceType = string.Format("{0}type", fsGlobalConfig.InternalFieldPrefix);
@@ -83,7 +83,7 @@ namespace FullSerializer {
         /// </summary>
         /// <remarks>
         /// After making this call, you will *not* be able to deserialize the
-        /// same object instance. The metadata is strictly necessary for
+        /// same object Instance. The metadata is strictly necessary for
         /// deserialization!
         /// </remarks>
         public static void StripDeserializationMetadata(ref fsData data) {
@@ -191,10 +191,10 @@ namespace FullSerializer {
         }
 
         /// <summary>
-        /// This manages instance writing so that we do not write unnecessary $id
+        /// This manages Instance writing so that we do not write unnecessary $id
         /// fields. We only need to write out an $id field when there is a
         /// corresponding $ref field. This is able to write $id references lazily
-        /// because the fsData instance is not actually written out to text until
+        /// because the fsData Instance is not actually written out to text until
         /// we have entirely finished serializing it.
         /// </summary>
         internal class fsLazyCycleDefinitionWriter {
@@ -233,7 +233,7 @@ namespace FullSerializer {
             }
         }
 
-        /// <summary> Converter type to converter instance lookup table. This
+        /// <summary> Converter type to converter Instance lookup table. This
         /// could likely be stored inside
         // of _cachedConverters, but there is a semantic difference because
         // _cachedConverters goes
@@ -450,8 +450,8 @@ namespace FullSerializer {
         /// </summary>
         public void AddConverter(fsBaseConverter converter) {
             if (converter.Serializer != null) {
-                throw new InvalidOperationException("Cannot add a single converter instance to " +
-                    "multiple fsConverters -- please construct a new instance for " + converter);
+                throw new InvalidOperationException("Cannot add a single converter Instance to " +
+                    "multiple fsConverters -- please construct a new Instance for " + converter);
             }
 
             // TODO: wrap inside of a ConverterManager so we can control
@@ -546,7 +546,7 @@ namespace FullSerializer {
 
         /// <summary>
         /// Helper method that simply forwards the call to
-        /// TrySerialize(typeof(T), instance, out data);
+        /// TrySerialize(typeof(T), Instance, out data);
         /// </summary>
         public fsResult TrySerialize<T>(T instance, out fsData data) {
             return TrySerialize(typeof(T), instance, out data);
@@ -568,12 +568,12 @@ namespace FullSerializer {
         /// Serialize the given value.
         /// </summary>
         /// <param name="storageType">
-        /// The type of field/property that stores the object instance. This is
+        /// The type of field/property that stores the object Instance. This is
         /// important particularly for inheritance, as a field storing an
-        /// IInterface instance should have type information included.
+        /// IInterface Instance should have type information included.
         /// </param>
         /// <param name="instance">
-        /// The actual object instance to serialize.
+        /// The actual object Instance to serialize.
         /// </param>
         /// <param name="data">The serialized state of the object.</param>
         /// <returns>If serialization was successful.</returns>
@@ -585,9 +585,9 @@ namespace FullSerializer {
         /// Serialize the given value.
         /// </summary>
         /// <param name="storageType">
-        /// The type of field/property that stores the object instance. This is
+        /// The type of field/property that stores the object Instance. This is
         /// important particularly for inheritance, as a field storing an
-        /// IInterface instance should have type information included.
+        /// IInterface Instance should have type information included.
         /// </param>
         /// <param name="overrideConverterType">
         /// An fsBaseConverter derived type that will be used to serialize the
@@ -595,7 +595,7 @@ namespace FullSerializer {
         /// mechanisms.
         /// </param>
         /// <param name="instance">
-        /// The actual object instance to serialize.
+        /// The actual object Instance to serialize.
         /// </param>
         /// <param name="data">The serialized state of the object.</param>
         /// <returns>If serialization was successful.</returns>
@@ -632,7 +632,7 @@ namespace FullSerializer {
                     return InternalSerialize_2_Inheritance(storageType, overrideConverterType, instance, out data);
                 }
 
-                // We've already serialized this object instance (or it is
+                // We've already serialized this object Instance (or it is
                 // pending higher up on the call stack). Just serialize a
                 // reference to it to escape the cycle.
                 //
@@ -645,7 +645,7 @@ namespace FullSerializer {
                 }
 
                 // Mark inside the object graph that we've serialized the
-                // instance. We do this *before* serialization so that if we get
+                // Instance. We do this *before* serialization so that if we get
                 // back into this function recursively, it'll already be marked
                 // and we can handle the cycle properly without going into an
                 // infinite loop.
@@ -674,8 +674,8 @@ namespace FullSerializer {
             if (serializeResult.Failed) return serializeResult;
 
             // Do we need to add type information? If the field type and the
-            // instance type are different then we will not be able to recover
-            // the correct instance type from the field type when we deserialize
+            // Instance type are different then we will not be able to recover
+            // the correct Instance type from the field type when we deserialize
             // the object.
             //
             // Note: We allow converters to request that we do *not* add type
@@ -694,7 +694,7 @@ namespace FullSerializer {
             // note: We do not have to take a Type parameter here, since at this
             //       point in the serialization algorithm inheritance has
             // *always* been handled. If we took a type parameter, it will
-            // *always* be equal to instance.GetType(), so why bother taking the
+            // *always* be equal to Instance.GetType(), so why bother taking the
             //  parameter?
 
             // Check to see if there is versioning information for this type. If
@@ -769,7 +769,7 @@ namespace FullSerializer {
             // We handle object references first because we could be
             // deserializing a cyclic type that is inherited. If that is the
             // case, then if we handle references after inheritances we will try
-            // to create an object instance for an abstract/interface type.
+            // to create an object Instance for an abstract/interface type.
 
             // While object construction should technically be two-pass, we can
             // do it in one pass because of how serialization happens. We
@@ -842,7 +842,7 @@ namespace FullSerializer {
 
             // If the serialized state contains type information, then we need to
             // make sure to update our objectType and data to the proper values
-            // so that when we construct an object instance later and run
+            // so that when we construct an object Instance later and run
             // deserialization we run it on the proper type.
             if (IsTypeSpecified(data)) {
                 fsData typeNameData = data.AsDictionary[Key_InstanceType];
@@ -863,7 +863,7 @@ namespace FullSerializer {
                     }
 
                     if (storageType.IsAssignableFrom(type) == false) {
-                        deserializeResult.AddMessage("Ignoring type specifier; a field/property of type " + storageType + " cannot hold an instance of " + type);
+                        deserializeResult.AddMessage("Ignoring type specifier; a field/property of type " + storageType + " cannot hold an Instance of " + type);
                         break;
                     }
 
@@ -883,8 +883,8 @@ namespace FullSerializer {
 
             Invoke_OnBeforeDeserialize(processors, storageType, ref data);
 
-            // Construct an object instance if we don't have one already. We also
-            // need to construct an instance if the result type is of the wrong
+            // Construct an object Instance if we don't have one already. We also
+            // need to construct an Instance if the result type is of the wrong
             // type, which may be the case when we have a versioned import graph.
             if (ReferenceEquals(result, null) || result.GetType() != objectType) {
                 result = GetConverter(objectType, overrideConverterType).CreateInstance(data, objectType);
@@ -892,7 +892,7 @@ namespace FullSerializer {
 
             // We call OnBeforeDeserializeAfterInstanceCreation here because we
             // still want to invoke the method even if the user passed in an
-            // existing instance.
+            // existing Instance.
             Invoke_OnBeforeDeserializeAfterInstanceCreation(processors, storageType, result, ref data);
 
             // NOTE: It is critically important that we pass the actual
@@ -915,9 +915,9 @@ namespace FullSerializer {
                 // object (TODO: verify in the deserialization logic)
 
                 // Since at this stage in the deserialization process we already
-                // have access to the object instance, so we just need to sync
+                // have access to the object Instance, so we just need to sync
                 // the object id to the references database so that when we
-                // encounter the instance we lookup this same object. We want to
+                // encounter the Instance we lookup this same object. We want to
                 // do this before actually deserializing the object because when
                 // deserializing the object there may be references to itself.
 

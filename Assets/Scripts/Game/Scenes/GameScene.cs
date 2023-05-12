@@ -8,10 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.UI;
-
-using FullSerializer;
 
 using GameVanilla.Core;
 using GameVanilla.Game.Common;
@@ -44,8 +41,7 @@ namespace GameVanilla.Game.Scenes
 
         public List<AudioClip> gameSounds;
 
-        [HideInInspector]
-        public Level level;
+        public LevelData LevelData;
 
         [HideInInspector]
         public List<GameObject> tileEntities = new List<GameObject>();
@@ -57,8 +53,6 @@ namespace GameVanilla.Game.Scenes
         public Text ingameBoosterText;
 
         private readonly GameState gameState = new GameState();
-
-        private GameConfiguration gameConfig;
 
         private bool gameStarted;
         private bool gameFinished;
@@ -91,22 +85,19 @@ namespace GameVanilla.Game.Scenes
 
         private Camera mainCamera;
 
+        private int m_BlockScore;
+
         /// <summary>
         /// Unity's Start method.
         /// </summary>
         private void Start()
         {
+            m_BlockScore = GameData.StaticData.BlockScore;
             mainCamera = Camera.main;
-
-            var serializer = new fsSerializer();
-            gameConfig = FileUtils.LoadJsonFile<GameConfiguration>(serializer, "game_configuration");
-            level = FileUtils.LoadJsonFile<Level>(serializer, "Levels/" + PuzzleMatchManager.instance.lastSelectedLevel);
+            LevelData = LevelDataRegistory.Instance.GetLevelData(1);
 
             ResetLevelData();
-
             CreateBackgroundTiles();
-
-            SetPurchasableBoostersData();
 
             SoundManager.instance.AddSounds(gameSounds);
 
@@ -125,15 +116,6 @@ namespace GameVanilla.Game.Scenes
         /// </summary>
         private void Update()
         {
-            if (!gameStarted || gameFinished || currentlyAwardingBoosters)
-            {
-                return;
-            }
-
-            if (currentPopups.Count > 0)
-            {
-                return;
-            }
 
             if (boosterMode)
             {
@@ -212,6 +194,12 @@ namespace GameVanilla.Game.Scenes
         /// <returns>The spawned game object.</returns>
         private GameObject CreateBlock(GameObject go)
         {
+            if (go == null)
+            {
+                Debug.Log("null");
+                
+                return go ;
+            }
             go.GetComponent<TileEntity>().Spawn();
             return go;
         }
@@ -254,17 +242,17 @@ namespace GameVanilla.Game.Scenes
         }
 
         /// <summary>
-        /// Applies the penalty for missing a match to the level (if any).
+        /// Applies the penalty for missing a match to the LevelData (if any).
         /// </summary>
         private void ApplyPenalty()
         {
-            if (applyingPenalty || level.penalty <= 0)
+            if (applyingPenalty || LevelData.penalty <= 0)
             {
                 return;
             }
 
             applyingPenalty = true;
-            StartCoroutine(AnimateLimitDown(level.penalty));
+            StartCoroutine(AnimateLimitDown(LevelData.penalty));
         }
 
         /// <summary>
@@ -274,13 +262,13 @@ namespace GameVanilla.Game.Scenes
         /// <returns>The coroutine.</returns>
         private IEnumerator AnimateLimitDown(int penalty)
         {
-            if (level.limitType == LimitType.Time)
+            if (LevelData.limitType == LimitType.Time)
             {
                 StopCoroutine(countdownCoroutine);
             }
 
             var endValue = currentLimit - penalty;
-            if (level.limitType == LimitType.Time)
+            if (LevelData.limitType == LimitType.Time)
             {
                 endValue += 1;
             }
@@ -288,14 +276,9 @@ namespace GameVanilla.Game.Scenes
             while (currentLimit > 0 && currentLimit != endValue)
             {
                 currentLimit -= 1;
-                UpdateLimitText();
                 yield return new WaitForSeconds(0.1f);
             }
 
-            if (level.limitType == LimitType.Time)
-            {
-                countdownCoroutine = StartCoroutine(StartCountdown());
-            }
 
             applyingPenalty = false;
         }
@@ -370,7 +353,7 @@ namespace GameVanilla.Game.Scenes
         /// <returns>The score obtained by the destruction of the ice.</returns>
         private int DestroyIce(GameObject blocker, int idx)
         {
-            var score = gameConfig.GetBlockerScore(BlockerType.Ice);
+            var score = m_BlockScore;
 
             blockers[idx].GetComponent<PooledObject>().pool.ReturnObject(blockers[idx]);
             gameState.collectedBlockers[BlockerType.Ice] += 1;
@@ -401,7 +384,7 @@ namespace GameVanilla.Game.Scenes
                 gameState.collectedBlocks[block.type] += 1;
             }
 
-            var tileScore = gameConfig.GetScore(tileEntity);
+            var tileScore = m_BlockScore;
 
             var particles = gamePools.GetParticles(tileEntity);
             if (particles != null)
@@ -444,7 +427,7 @@ namespace GameVanilla.Game.Scenes
         }
 
         /// <summary>
-        /// Resets the level data. This is particularly useful when replaying a level.
+        /// Resets the LevelData data. This is particularly useful when replaying a LevelData.
         /// </summary>
         public void ResetLevelData()
         {
@@ -454,23 +437,12 @@ namespace GameVanilla.Game.Scenes
 
             generatedCollectables = 0;
             neededCollectables = 0;
-            foreach (var goal in level.goals)
-            {
-                if (goal is CollectBlockGoal)
-                {
-                    var blockGoal = goal as CollectBlockGoal;
-                    if (blockGoal.blockType == BlockType.Collectable)
-                    {
-                        neededCollectables += blockGoal.amount;
-                    }
-                }
-            }
 
             gameState.Reset();
 
             gameUi.limitText.text = "";
             gameUi.scoreText.text = gameState.score.ToString();
-            gameUi.progressBar.Fill(level.score1, level.score2, level.score3);
+            gameUi.progressBar.Fill(LevelData.score1, LevelData.score2, LevelData.score3);
 
             foreach (var pool in gamePools.GetComponentsInChildren<ObjectPool>())
             {
@@ -480,12 +452,16 @@ namespace GameVanilla.Game.Scenes
             blockers.Clear();
             tilePositions.Clear();
 
-            for (var j = 0; j < level.height; j++)
+            for (var j = 0; j < LevelData.height; j++)
             {
-                for (var i = 0; i < level.width; i++)
+                for (var i = 0; i < LevelData.width; i++)
                 {
-                    var tileIndex = i + (j * level.width);
-                    var tileToGet = gamePools.GetTileEntity(level, level.tiles[tileIndex]);
+                    var tileIndex = i + (j * LevelData.width);
+                    var tileToGet = gamePools.GetTileEntity(LevelData, LevelData.tiles[tileIndex]);
+                    if (tileToGet == null)
+                    {
+                        Debug.Log("null Here");
+                    }
                     var tile = CreateBlock(tileToGet.gameObject);
                     var spriteRenderer = tile.GetComponent<SpriteRenderer>();
                     blockWidth = spriteRenderer.bounds.size.x;
@@ -493,7 +469,7 @@ namespace GameVanilla.Game.Scenes
                     tile.transform.position = new Vector2(i * (blockWidth + horizontalSpacing),
                         -j * (blockHeight + verticalSpacing));
                     tileEntities.Add(tile);
-                    spriteRenderer.sortingOrder = level.height - j;
+                    spriteRenderer.sortingOrder = LevelData.height - j;
 
                     var block = tile.GetComponent<Block>();
                     if (block != null && block.type == BlockType.Collectable)
@@ -502,8 +478,8 @@ namespace GameVanilla.Game.Scenes
                     }
                 }
             }
-            var totalWidth = (level.width - 1) * (blockWidth + horizontalSpacing);
-            var totalHeight = (level.height - 1) * (blockHeight + verticalSpacing);
+            var totalWidth = (LevelData.width - 1) * (blockWidth + horizontalSpacing);
+            var totalHeight = (LevelData.height - 1) * (blockHeight + verticalSpacing);
             foreach (var block in tileEntities)
             {
                 var newPos = block.transform.position;
@@ -514,12 +490,12 @@ namespace GameVanilla.Game.Scenes
                 tilePositions.Add(newPos);
             }
 
-            for (var j = 0; j < level.height; j++)
+            for (var j = 0; j < LevelData.height; j++)
             {
-                for (var i = 0; i < level.width; i++)
+                for (var i = 0; i < LevelData.width; i++)
                 {
-                    var tileIndex = i + (j * level.width);
-                    if (level.tiles[tileIndex].blockerType == BlockerType.Ice)
+                    var tileIndex = i + (j * LevelData.width);
+                    if (LevelData.tiles[tileIndex].blockerType == BlockerType.Ice)
                     {
                         var cover = gamePools.icePool.GetObject();
                         cover.transform.position = tilePositions[tileIndex];
@@ -533,24 +509,21 @@ namespace GameVanilla.Game.Scenes
                 }
             }
 
-            var zoomLevel = gameConfig.GetZoomLevel();
-            mainCamera.orthographicSize = (totalWidth * zoomLevel) * (Screen.height / (float)Screen.width) * 0.5f;
-
-            OpenPopup<LevelGoalsPopup>("Popups/LevelGoalsPopup", popup => popup.SetGoals(level.goals));
+            //    OpenPopup<LevelGoalsPopup>("Popups/LevelGoalsPopup", popup => popup.SetGoals(LevelData.goal));
         }
 
         /// <summary>
-        /// Creates the background tiles of the level.
+        /// Creates the background tiles of the LevelData.
         /// </summary>
         private void CreateBackgroundTiles()
         {
             var backgroundTiles = new GameObject("BackgroundTiles");
-            for (var j = 0; j < level.height; j++)
+            for (var j = 0; j < LevelData.height; j++)
             {
-                for (var i = 0; i < level.width; i++)
+                for (var i = 0; i < LevelData.width; i++)
                 {
-                    var tileIndex = i + (j * level.width);
-                    var tile = level.tiles[tileIndex];
+                    var tileIndex = i + (j * LevelData.width);
+                    var tile = LevelData.tiles[tileIndex];
                     var blockTile = tile as BlockTile;
                     if (blockTile != null && blockTile.type == BlockType.Empty)
                     {
@@ -633,17 +606,17 @@ namespace GameVanilla.Game.Scenes
         }
 
         /// <summary>
-        /// Regenerates the level when no matches are possible.
+        /// Regenerates the LevelData when no matches are possible.
         /// </summary>
         /// <returns>The coroutine.</returns>
         private IEnumerator RegenerateLevel()
         {
             yield return new WaitForSeconds(2.0f);
-            for (var i = 0; i < level.width; i++)
+            for (var i = 0; i < LevelData.width; i++)
             {
-                for (var j = 0; j < level.height; j++)
+                for (var j = 0; j < LevelData.height; j++)
                 {
-                    var idx = i + (j * level.width);
+                    var idx = i + (j * LevelData.width);
                     var block = tileEntities[idx];
                     if (block != null)
                     {
@@ -667,8 +640,8 @@ namespace GameVanilla.Game.Scenes
         {
             var score = 0;
 
-            var i = idx % level.width;
-            var j = idx / level.width;
+            var i = idx % LevelData.width;
+            var j = idx / LevelData.width;
 
             var topTile = new TileDef(i, j - 1);
             var bottomTile = new TileDef(i, j + 1);
@@ -679,7 +652,7 @@ namespace GameVanilla.Game.Scenes
             {
                 if (IsValidTileEntity(surroundingTile))
                 {
-                    var tileIndex = (level.width * surroundingTile.y) + surroundingTile.x;
+                    var tileIndex = (LevelData.width * surroundingTile.y) + surroundingTile.x;
                     var tile = tileEntities[tileIndex];
                     if (tile != null)
                     {
@@ -703,8 +676,8 @@ namespace GameVanilla.Game.Scenes
         private void GetMatches(GameObject go, List<GameObject> matchedTiles)
         {
             var idx = tileEntities.FindIndex(x => x == go);
-            var i = idx % level.width;
-            var j = idx / level.width;
+            var i = idx % LevelData.width;
+            var j = idx / LevelData.width;
 
             var topTile = new TileDef(i, j - 1);
             var bottomTile = new TileDef(i, j + 1);
@@ -717,7 +690,7 @@ namespace GameVanilla.Game.Scenes
             {
                 if (IsValidTileEntity(surroundingTile))
                 {
-                    var tileIndex = (level.width * surroundingTile.y) + surroundingTile.x;
+                    var tileIndex = (LevelData.width * surroundingTile.y) + surroundingTile.x;
                     var tile = tileEntities[tileIndex];
                     if (tile != null)
                     {
@@ -744,7 +717,7 @@ namespace GameVanilla.Game.Scenes
             {
                 if (IsValidTileEntity(surroundingTile))
                 {
-                    var tileIndex = (level.width * surroundingTile.y) + surroundingTile.x;
+                    var tileIndex = (LevelData.width * surroundingTile.y) + surroundingTile.x;
                     var tile = tileEntities[tileIndex];
                     if (tile != null)
                     {
@@ -767,13 +740,13 @@ namespace GameVanilla.Game.Scenes
         private void CreateBooster(int numMatchedBlocks, int blockIdx)
         {
             var eligibleBoosters = new List<KeyValuePair<BoosterType, int>>();
-            foreach (var pair in gameConfig.boosterNeededMatches)
-            {
-                if (numMatchedBlocks >= pair.Value)
-                {
-                    eligibleBoosters.Add(pair);
-                }
-            }
+            // foreach (var pair in gameConfig.boosterNeededMatches)
+            // {
+            //     if (numMatchedBlocks >= pair.Value)
+            //     {
+            //         eligibleBoosters.Add(pair);
+            //     }
+            // }
 
             if (eligibleBoosters.Count > 0)
             {
@@ -836,8 +809,6 @@ namespace GameVanilla.Game.Scenes
                     break;
 
             }
-
-            Assert.IsNotNull(boosterPool);
             var booster = CreateBlock(boosterPool.GetObject());
             CreateBooster(booster, blockIdx);
         }
@@ -851,8 +822,8 @@ namespace GameVanilla.Game.Scenes
         {
             booster.transform.position = tilePositions[blockIdx];
             tileEntities[blockIdx] = booster;
-            var j = blockIdx / level.height;
-            booster.GetComponent<SpriteRenderer>().sortingOrder = level.height - j;
+            var j = blockIdx / LevelData.height;
+            booster.GetComponent<SpriteRenderer>().sortingOrder = LevelData.height - j;
 
             var particles = gamePools.boosterSpawnParticlesPool.GetObject();
             particles.AddComponent<AutoKillPooled>();
@@ -864,7 +835,7 @@ namespace GameVanilla.Game.Scenes
         }
 
         /// <summary>
-        /// Utility coroutine to apply the gravity to the level.
+        /// Utility coroutine to apply the gravity to the LevelData.
         /// </summary>
         /// <returns></returns>
         private IEnumerator ApplyGravityAsync()
@@ -877,15 +848,15 @@ namespace GameVanilla.Game.Scenes
         }
 
         /// <summary>
-        /// Applies the gravity to the level.
+        /// Applies the gravity to the LevelData.
         /// </summary>
         private void ApplyGravity()
         {
-            for (var i = 0; i < level.width; i++)
+            for (var i = 0; i < LevelData.width; i++)
             {
-                for (var j = level.height - 1; j >= 0; j--)
+                for (var j = LevelData.height - 1; j >= 0; j--)
                 {
-                    var tileIndex = i + (j * level.width);
+                    var tileIndex = i + (j * LevelData.width);
                     if (tileEntities[tileIndex] == null ||
                         IsEmptyBlock(tileEntities[tileIndex].GetComponent<TileEntity>()) ||
                         IsStoneBlock(tileEntities[tileIndex].GetComponent<TileEntity>()))
@@ -895,9 +866,9 @@ namespace GameVanilla.Game.Scenes
 
                     // Find bottom.
                     var bottom = -1;
-                    for (var k = j; k < level.height; k++)
+                    for (var k = j; k < LevelData.height; k++)
                     {
-                        var idx = i + (k * level.width);
+                        var idx = i + (k * LevelData.width);
                         if (tileEntities[idx] == null)
                         {
                             bottom = k;
@@ -918,9 +889,9 @@ namespace GameVanilla.Game.Scenes
                         if (tile != null)
                         {
                             var numTilesToFall = bottom - j;
-                            tileEntities[tileIndex + (numTilesToFall * level.width)] = tileEntities[tileIndex];
+                            tileEntities[tileIndex + (numTilesToFall * LevelData.width)] = tileEntities[tileIndex];
                             var tween = LeanTween.move(tile,
-                                tilePositions[tileIndex + level.width * numTilesToFall],
+                                tilePositions[tileIndex + LevelData.width * numTilesToFall],
                                 blockFallSpeed);
                             tween.setEase(LeanTweenType.easeInQuad);
                             tween.setOnComplete(() =>
@@ -936,12 +907,12 @@ namespace GameVanilla.Game.Scenes
                 }
             }
 
-            for (var i = 0; i < level.width; i++)
+            for (var i = 0; i < LevelData.width; i++)
             {
                 var numEmpties = 0;
-                for (var j = 0; j < level.height; j++)
+                for (var j = 0; j < LevelData.height; j++)
                 {
-                    var idx = i + (j * level.width);
+                    var idx = i + (j * LevelData.width);
                     if (tileEntities[idx] == null)
                     {
                         numEmpties += 1;
@@ -958,9 +929,9 @@ namespace GameVanilla.Game.Scenes
 
                 if (numEmpties > 0)
                 {
-                    for (var j = 0; j < level.height; j++)
+                    for (var j = 0; j < LevelData.height; j++)
                     {
-                        var tileIndex = i + (j * level.width);
+                        var tileIndex = i + (j * LevelData.width);
                         var isEmptyTile = false;
                         var isStoneTile = false;
                         if (tileEntities[tileIndex] != null)
@@ -998,7 +969,7 @@ namespace GameVanilla.Game.Scenes
                         }
                         if (tileEntities[tileIndex] != null)
                         {
-                            tileEntities[tileIndex].GetComponent<SpriteRenderer>().sortingOrder = level.height - j;
+                            tileEntities[tileIndex].GetComponent<SpriteRenderer>().sortingOrder = LevelData.height - j;
                         }
                     }
                 }
@@ -1013,14 +984,14 @@ namespace GameVanilla.Game.Scenes
         {
             var percent = UnityEngine.Random.Range(0, 100);
             if (generatedCollectables < neededCollectables &&
-                percent < level.collectableChance)
+                percent < LevelData.collectableChance)
             {
                 generatedCollectables += 1;
-                return CreateBlock(gamePools.GetTileEntity(level, new BlockTile { type = BlockType.Collectable }).gameObject);
+                return CreateBlock(gamePools.GetTileEntity(LevelData, new BlockTile { type = BlockType.Collectable }).gameObject);
             }
             else
             {
-                return CreateBlock(gamePools.GetTileEntity(level, new BlockTile { type = BlockType.RandomBlock }).gameObject);
+                return CreateBlock(gamePools.GetTileEntity(LevelData, new BlockTile { type = BlockType.RandomBlock }).gameObject);
             }
         }
 
@@ -1030,13 +1001,13 @@ namespace GameVanilla.Game.Scenes
         private void CheckForCollectables()
         {
             var collectablesToDestroy = new List<Block>();
-            for (var i = 0; i < level.width; i++)
+            for (var i = 0; i < LevelData.width; i++)
             {
                 Block bottom = null;
                 var tileIndex = 0;
-                for (var j = level.height - 1; j >= 0; j--)
+                for (var j = LevelData.height - 1; j >= 0; j--)
                 {
-                    tileIndex = i + (j * level.width);
+                    tileIndex = i + (j * LevelData.width);
                     if (tileEntities[tileIndex] == null)
                     {
                         continue;
@@ -1090,7 +1061,7 @@ namespace GameVanilla.Game.Scenes
         /// <summary>
         /// Updates the state of the game based on the last move performed by the player.
         /// </summary>
-        /// <param name="updateLimits">True if the current limits of the level should be updated; false otherwise.</param>
+        /// <param name="updateLimits">True if the current limits of the LevelData should be updated; false otherwise.</param>
         private void PerformMove(bool updateLimits)
         {
             if (currentlyAwardingBoosters)
@@ -1098,14 +1069,13 @@ namespace GameVanilla.Game.Scenes
                 return;
             }
 
-            if (level.limitType == LimitType.Moves && updateLimits)
+            if (LevelData.limitType == LimitType.Moves && updateLimits)
             {
                 --currentLimit;
                 if (currentLimit < 0)
                 {
                     currentLimit = 0;
                 }
-                UpdateLimitText();
             }
 
             gameUi.goalUi.UpdateGoals(gameState);
@@ -1116,19 +1086,17 @@ namespace GameVanilla.Game.Scenes
         /// </summary>
         public void StartGame()
         {
-            currentLimit = level.limit;
-            UpdateLimitText();
-            if (level.limitType == LimitType.Moves)
+            currentLimit = LevelData.limit;
+            if (LevelData.limitType == LimitType.Moves)
             {
                 gameUi.limitTitleText.text = "Moves";
             }
-            else if (level.limitType == LimitType.Time)
+            else if (LevelData.limitType == LimitType.Time)
             {
                 gameUi.limitTitleText.text = "Time";
-                countdownCoroutine = StartCoroutine(StartCountdown());
             }
 
-            gameUi.SetGoals(level.goals, goalPrefab);
+            gameUi.SetGoals(LevelData.goal, goalPrefab);
 
             gameStarted = true;
         }
@@ -1139,10 +1107,7 @@ namespace GameVanilla.Game.Scenes
         private void EndGame()
         {
             gameFinished = true;
-            if (countdownCoroutine != null)
-            {
-                StopCoroutine(countdownCoroutine);
-            }
+            RestartGame();
         }
 
         /// <summary>
@@ -1152,22 +1117,7 @@ namespace GameVanilla.Game.Scenes
         {
             ResetLevelData();
         }
-
-        /// <summary>
-        /// Starts the level countdown (used only in time-limited levels).
-        /// </summary>
-        /// <returns>The coroutine.</returns>
-        private IEnumerator StartCountdown()
-        {
-            while (currentLimit > 0)
-            {
-                --currentLimit;
-                UpdateLimitText();
-                yield return new WaitForSeconds(1.0f);
-            }
-            CheckEndGame();
-        }
-
+        
         /// <summary>
         /// Checks if the game has finished.
         /// </summary>
@@ -1183,48 +1133,11 @@ namespace GameVanilla.Game.Scenes
                 return;
             }
 
-            var goalsComplete = true;
-            foreach (var goal in level.goals)
-            {
-                if (!goal.IsComplete(gameState))
-                {
-                    goalsComplete = false;
-                    break;
-                }
-            }
-
-            if (currentLimit == 0)
-            {
-                EndGame();
-            }
-
+            var goalsComplete = LevelData.goal.IsComplete(gameState);
+            
             if (goalsComplete)
             {
                 EndGame();
-
-                var nextLevel = PlayerPrefs.GetInt("next_level");
-                if (nextLevel == 0)
-                {
-                    nextLevel = 1;
-                }
-                if (level.id == nextLevel)
-                {
-                    PlayerPrefs.SetInt("next_level", level.id + 1);
-                    PuzzleMatchManager.instance.unlockedNextLevel = true;
-                }
-                else
-                {
-                    PuzzleMatchManager.instance.unlockedNextLevel = false;
-                }
-
-                if (level.limitType == LimitType.Moves && level.awardBoostersWithRemainingMoves && currentLimit > 0)
-                {
-                    StartCoroutine(AwardBoosters());
-                }
-                else
-                {
-                    StartCoroutine(OpenWinPopupAsync());
-                }
             }
             else
             {
@@ -1236,75 +1149,13 @@ namespace GameVanilla.Game.Scenes
         }
 
         /// <summary>
-        /// Awards boosters at the end of a level.
-        /// </summary>
-        /// <returns>The coroutine.</returns>
-        private IEnumerator AwardBoosters()
-        {
-            yield return new WaitForSeconds(1.0f);
-            OpenPopup<BoosterAwardPopup>("Popups/BoosterAwardPopup");
-            yield return new WaitForSeconds(1.5f);
-            currentlyAwardingBoosters = true;
-            while (currentLimit > 0)
-            {
-                int randomIdx;
-                do
-                {
-                    randomIdx = UnityEngine.Random.Range(0, tileEntities.Count);
-                } while (tileEntities[randomIdx] != null && !IsColorBlock(tileEntities[randomIdx].GetComponent<TileEntity>()));
-
-                var tile = tileEntities[randomIdx];
-                tileEntities[randomIdx] = null;
-                if (tile != null)
-                {
-                    tile.GetComponent<PooledObject>().pool.ReturnObject(tile.gameObject);
-                }
-                CreateBooster(level.awardedBoosterType, randomIdx);
-                SoundManager.instance.PlaySound("BoosterAward");
-
-                currentLimit -= 1;
-                UpdateLimitText();
-                yield return new WaitForSeconds(0.25f);
-            }
-            do
-            {
-                GameObject tileToExplode = null;
-                foreach (var tile in tileEntities)
-                {
-                    if (tile != null && tile.GetComponent<Booster>() != null)
-                    {
-                        tileToExplode = tile;
-                        break;
-                    }
-                }
-
-                if (tileToExplode != null)
-                {
-                    DestroyBooster(tileToExplode.GetComponent<Booster>());
-                    yield return new WaitForSeconds(0.5f);
-                }
-            } while (tileEntities.Find(x => x != null && IsBoosterBlock(x.GetComponent<TileEntity>())) != null);
-            OpenWinPopup();
-        }
-
-        /// <summary>
-        /// Opens the win popup.
-        /// </summary>
-        /// <returns>The coroutine.</returns>
-        private IEnumerator OpenWinPopupAsync()
-        {
-            yield return new WaitForSeconds(endGamePopupDelay);
-            OpenWinPopup();
-        }
-
-        /// <summary>
         /// Opens the popup for buying additional moves or time.
         /// </summary>
         /// <returns>The coroutine.</returns>
         private IEnumerator OpenNoMovesOrTimePopupAsync()
         {
             yield return new WaitForSeconds(endGamePopupDelay);
-            OpenNoMovesOrTimePopup();
+            RestartGame();
         }
 
         /// <summary>
@@ -1314,26 +1165,26 @@ namespace GameVanilla.Game.Scenes
         {
             OpenPopup<WinPopup>("Popups/WinPopup", popup =>
             {
-                var levelStars = PlayerPrefs.GetInt("level_stars_" + level.id);
-                if (gameState.score >= level.score3)
+                var levelStars = PlayerPrefs.GetInt("level_stars_" + LevelData.id);
+                if (gameState.score >= LevelData.score3)
                 {
                     popup.SetStars(3);
-                    PlayerPrefs.SetInt("level_stars_" + level.id, 3);
+                    PlayerPrefs.SetInt("level_stars_" + LevelData.id, 3);
                 }
-                else if (gameState.score >= level.score2)
+                else if (gameState.score >= LevelData.score2)
                 {
                     popup.SetStars(2);
                     if (levelStars < 3)
                     {
-                        PlayerPrefs.SetInt("level_stars_" + level.id, 2);
+                        PlayerPrefs.SetInt("level_stars_" + LevelData.id, 2);
                     }
                 }
-                else if (gameState.score >= level.score1)
+                else if (gameState.score >= LevelData.score1)
                 {
                     popup.SetStars(1);
                     if (levelStars < 2)
                     {
-                        PlayerPrefs.SetInt("level_stars_" + level.id, 1);
+                        PlayerPrefs.SetInt("level_stars_" + LevelData.id, 1);
                     }
                 }
                 else
@@ -1341,70 +1192,38 @@ namespace GameVanilla.Game.Scenes
                     popup.SetStars(0);
                 }
 
-                popup.SetLevel(level.id);
+                popup.SetLevel(LevelData.id);
 
-                var levelScore = PlayerPrefs.GetInt("level_score_" + level.id);
+                var levelScore = PlayerPrefs.GetInt("level_score_" + LevelData.id);
                 if (levelScore < gameState.score)
                 {
-                    PlayerPrefs.SetInt("level_score_" + level.id, gameState.score);
+                    PlayerPrefs.SetInt("level_score_" + LevelData.id, gameState.score);
                 }
 
                 popup.SetScore(gameState.score);
                 popup.SetGoals(gameUi.goalUi.group.gameObject);
             });
         }
-
-        /// <summary>
-        /// Opens the popup for buying additional moves or time.
-        /// </summary>
-        private void OpenNoMovesOrTimePopup()
-        {
-            OpenPopup<NoMovesOrTimePopup>("Popups/NoMovesOrTimePopup",
-                popup => { popup.SetGameScene(this); });
-        }
-
-        /// <summary>
-        /// Opens the lose popup.
-        /// </summary>
-        public void OpenLosePopup()
-        {
-            PuzzleMatchManager.instance.livesSystem.RemoveLife();
-            OpenPopup<LosePopup>("Popups/LosePopup", popup =>
-            {
-                popup.SetLevel(level.id);
-                popup.SetScore(gameState.score);
-                popup.SetGoals(gameUi.goalUi.group.gameObject);
-            });
-        }
-
-        /// <summary>
-        /// Continues the current game with additional moves/time.
-        /// </summary>
+        
         public void Continue()
         {
             gameFinished = false;
-            if (level.limitType == LimitType.Moves)
+            if (LevelData.limitType == LimitType.Moves)
             {
-                currentLimit = gameConfig.numExtraMoves;
+                currentLimit = LevelData.limit;
                 gameUi.limitText.text = currentLimit.ToString();
             }
-            else if (level.limitType == LimitType.Time)
+            else if (LevelData.limitType == LimitType.Time)
             {
-                currentLimit = gameConfig.numExtraTime;
+                currentLimit = LevelData.limit;
                 gameUi.limitText.text = currentLimit.ToString();
-                countdownCoroutine = StartCoroutine(StartCountdown());
             }
         }
 
-        /// <summary>
-        /// Returns true if the specified tile entity is valid and false otherwise.
-        /// </summary>
-        /// <param name="tileEntity">The tile entity.</param>
-        /// <returns>True if the specified tile entity is valid; false otherwise.</returns>
         private bool IsValidTileEntity(TileDef tileEntity)
         {
-            return tileEntity.x >= 0 && tileEntity.x < level.width &&
-                   tileEntity.y >= 0 && tileEntity.y < level.height;
+            return tileEntity.x >= 0 && tileEntity.x < LevelData.width &&
+                   tileEntity.y >= 0 && tileEntity.y < LevelData.height;
         }
 
         /// <summary>
@@ -1475,63 +1294,6 @@ namespace GameVanilla.Game.Scenes
             scoreText.GetComponent<ScoreText>().StartAnimation();
         }
 
-        /// <summary>
-        /// Updates the limit text.
-        /// </summary>
-        private void UpdateLimitText()
-        {
-            if (level.limitType == LimitType.Moves)
-            {
-                gameUi.limitText.text = currentLimit.ToString();
-            }
-            else if (level.limitType == LimitType.Time)
-            {
-                var timeSpan = TimeSpan.FromSeconds(currentLimit);
-                gameUi.limitText.text = string.Format("{0:D2}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
-            }
-        }
-
-        /// <summary>
-        /// Called when the settings button is pressed.
-        /// </summary>
-        public void OnSettingsButtonPressed()
-        {
-            if (currentPopups.Count == 0)
-            {
-                OpenPopup<InGameSettingsPopup>("Popups/InGameSettingsPopup");
-            }
-            else
-            {
-                CloseCurrentPopup();
-            }
-        }
-
-        /// <summary>
-        /// Loads the data of the purchasable boosters.
-        /// </summary>
-        private void SetPurchasableBoostersData()
-        {
-            
-        }
-
-        /// <summary>
-        /// Fades in the in-game booster overlay.
-        /// </summary>
-        private void FadeInInGameBoosterOverlay()
-        {
-            var tween = LeanTween.value(ingameBoosterPanel.gameObject, 0.0f, 1.0f, 0.4f).setOnUpdate(value =>
-            {
-                ingameBoosterPanel.GetComponent<CanvasGroup>().alpha = value;
-                ingameBoosterText.GetComponent<CanvasGroup>().alpha = value;
-
-            });
-            tween.setOnComplete(() => ingameBoosterPanel.GetComponent<CanvasGroup>().blocksRaycasts = true);
-            ingameBoosterBgTweenId = tween.id;
-        }
-
-        /// <summary>
-        /// Fades out the in-game booster overlay.
-        /// </summary>
         private void FadeOutInGameBoosterOverlay()
         {
             LeanTween.cancel(ingameBoosterBgTweenId, false);

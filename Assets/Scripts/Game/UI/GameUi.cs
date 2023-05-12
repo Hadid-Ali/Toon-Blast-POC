@@ -58,40 +58,21 @@ namespace GameVanilla.Game.UI
         }
 
         /// <summary>
-        /// Sets the goals in the goal UI.
+        /// Sets the goal in the goal UI.
         /// </summary>
-        /// <param name="goals">The list of goals of the current level.</param>
+        /// <param name="goals">The list of goal of the current LevelData.</param>
         /// <param name="itemGoalPrefab">The goal prefab.</param>
-        public void SetGoals(List<Goal> goals, GameObject itemGoalPrefab)
+        public void SetGoals(Goal goal, GameObject itemGoalPrefab)
         {
             var childrenToRemove = goalUi.group.GetComponentsInChildren<GoalUiElement>().ToList();
             foreach (var child in childrenToRemove)
             {
                 Destroy(child.gameObject);
             }
-
-            foreach (var goal in goals)
-            {
-                if (!(goal is CollectBlockGoal) && !(goal is CollectBlockerGoal))
-                {
-                    continue;
-                }
-                var goalObject = Instantiate(itemGoalPrefab);
-                goalObject.transform.SetParent(goalUi.group.transform, false);
-                goalObject.GetComponent<GoalUiElement>().Fill(goal);
-            }
-            var reachScoreGoal = goals.Find(x => x is ReachScoreGoal);
-            if (reachScoreGoal != null)
-            {
-                goalHeadline.SetActive(false);
-                scoreGoalHeadline.SetActive(true);
-                scoreGoalAmountText.text = ((ReachScoreGoal)reachScoreGoal).score.ToString();
-            }
-            else
-            {
-                scoreGoalHeadline.SetActive(false);
-                goalHeadline.SetActive(true);
-            }
+            
+            goalHeadline.SetActive(false);
+            scoreGoalHeadline.SetActive(true);
+            scoreGoalAmountText.text = goal.score.ToString();
         }
     }
 }

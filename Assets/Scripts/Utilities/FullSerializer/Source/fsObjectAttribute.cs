@@ -11,7 +11,7 @@ namespace FullSerializer {
         /// The previous model that should be used if an old version of this
         /// object is encountered. Using this attribute also requires that the
         /// type have a public constructor that takes only one parameter, an
-        /// object instance of the given type. Use of this parameter *requires*
+        /// object Instance of the given type. Use of this parameter *requires*
         /// that the VersionString parameter is also set.
         /// </summary>
         public Type[] PreviousModels;

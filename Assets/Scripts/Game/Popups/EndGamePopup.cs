@@ -53,20 +53,16 @@ namespace GameVanilla.Game.Popups
                     gameScene.RestartGame();
                     Close();
                 }
-                else
-                {
-                    gameScene.OpenPopup<BuyLivesPopup>("Popups/BuyLivesPopup");
-                }
             }
         }
 
         /// <summary>
-        /// Sets the level text.
+        /// Sets the LevelData text.
         /// </summary>
-        /// <param name="level">The level text.</param>
+        /// <param name="level">The LevelData text.</param>
         public void SetLevel(int level)
         {
-            levelText.text = "Level " + level;
+            levelText.text = "LevelData " + level;
         }
 
         /// <summary>
@@ -79,9 +75,9 @@ namespace GameVanilla.Game.Popups
         }
 
         /// <summary>
-        /// Sets the goals group.
+        /// Sets the goal group.
         /// </summary>
-        /// <param name="group">The goals group.</param>
+        /// <param name="group">The goal group.</param>
         public void SetGoals(GameObject group)
         {
             foreach (var goal in group.GetComponentsInChildren<GoalUiElement>())

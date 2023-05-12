@@ -17,7 +17,7 @@ using GameVanilla.Game.UI;
 namespace GameVanilla.Game.Popups
 {
     /// <summary>
-    /// This class contains the logic associated to the popup that shows the goals of a level.
+    /// This class contains the logic associated to the popup that shows the goal of a LevelData.
     /// </summary>
     public class LevelGoalsPopup : Popup
     {
@@ -90,25 +90,16 @@ namespace GameVanilla.Game.Popups
         }
 
         /// <summary>
-        /// Sets the goals of this popup.
+        /// Sets the goal of this popup.
         /// </summary>
-        /// <param name="goals">The goals to show on this popup.</param>
+        /// <param name="goals">The goal to show on this popup.</param>
         public void SetGoals(List<Goal> goals)
         {
-            foreach (var goal in goals)
-            {
-                if (goal is CollectBlockGoal || goal is CollectBlockerGoal)
-                {
-                    var goalObject = Instantiate(goalPrefab);
-                    goalObject.transform.SetParent(goalGroup.transform, false);
-                    goalObject.GetComponent<GoalUiElement>().Fill(goal);
-                }
-            }
-            var reachScoreGoal = goals.Find(x => x is ReachScoreGoal);
+            var reachScoreGoal = goals;
             if (reachScoreGoal != null)
             {
                 goalHeadline.SetActive(false);
-                scoreGoalAmountText.text = ((ReachScoreGoal)reachScoreGoal).score.ToString();
+          //      scoreGoalAmountText.text = ((ReachScoreGoal)reachScoreGoal).score.ToString();
             }
             else
             {

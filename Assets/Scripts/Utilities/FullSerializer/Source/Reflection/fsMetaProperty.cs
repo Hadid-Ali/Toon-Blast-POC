@@ -59,7 +59,7 @@ namespace FullSerializer.Internal {
         }
 
         /// <summary>
-        /// A custom fsBaseConverter instance to use for this field/property, if
+        /// A custom fsBaseConverter Instance to use for this field/property, if
         /// requested. This will be null if the default converter selection
         /// algorithm should be used. This is specified using the [fsObject]
         /// annotation with the Converter field.
@@ -119,7 +119,7 @@ namespace FullSerializer.Internal {
 
         /// <summary>
         /// Writes a value to the property that this MetaProperty represents,
-        /// using given object instance as the context.
+        /// using given object Instance as the context.
         /// </summary>
         public void Write(object context, object value) {
             FieldInfo field = _memberInfo as FieldInfo;
@@ -138,7 +138,7 @@ namespace FullSerializer.Internal {
 
         /// <summary>
         /// Reads a value from the property that this MetaProperty represents,
-        /// using the given object instance as the context.
+        /// using the given object Instance as the context.
         /// </summary>
         public object Read(object context) {
             if (_memberInfo is PropertyInfo) {

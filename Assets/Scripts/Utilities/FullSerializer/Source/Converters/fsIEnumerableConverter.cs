@@ -60,7 +60,7 @@ namespace FullSerializer.Internal {
 
             if ((result += CheckType(data, fsDataType.Array)).Failed) return result;
 
-            // For general strategy, instance may already have items in it. We
+            // For general strategy, Instance may already have items in it. We
             // will try to deserialize into the existing element.
             var elementStorageType = GetElementType(storageType);
             var addMethod = GetAddMethod(storageType);

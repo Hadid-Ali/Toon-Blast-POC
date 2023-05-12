@@ -11,7 +11,7 @@ using GameVanilla.Game.Common;
 namespace GameVanilla.Game.UI
 {
     /// <summary>
-    /// This class manages a single goal element within the in-game user interface for goals.
+    /// This class manages a single goal element within the in-game user interface for goal.
     /// </summary>
     public class GoalUiElement : MonoBehaviour
     {
@@ -44,37 +44,6 @@ namespace GameVanilla.Game.UI
         public virtual void Fill(Goal goal)
         {
             currentGoal = goal;
-            var blockGoal = goal as CollectBlockGoal;
-            if (blockGoal != null)
-            {
-                var specificGoal = blockGoal;
-                var texture = Resources.Load("Game/" + specificGoal.blockType) as Texture2D;
-                if (texture != null)
-                {
-                    image.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
-                        new Vector2(0.5f, 0.5f), 100);
-                }
-                targetAmount = specificGoal.amount;
-                amountText.text = targetAmount.ToString();
-            }
-            else
-            {
-                var blockerGoal = goal as CollectBlockerGoal;
-                if (blockerGoal == null)
-                {
-                    return;
-                }
-
-                var specificGoal = blockerGoal;
-                var texture = Resources.Load("Game/" + specificGoal.blockerType) as Texture2D;
-                if (texture != null)
-                {
-                    image.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height),
-                        new Vector2(0.5f, 0.5f), 100);
-                }
-                targetAmount = specificGoal.amount;
-                amountText.text = targetAmount.ToString();
-            }
         }
 
         /// <summary>
@@ -83,43 +52,7 @@ namespace GameVanilla.Game.UI
         /// <param name="state">The current game state.</param>
         public virtual void UpdateGoal(GameState state)
         {
-            if (currentAmount == targetAmount)
-            {
-                return;
-            }
-
-            var newAmount = 0;
-            var blockGoal = currentGoal as CollectBlockGoal;
-            if (blockGoal != null)
-            {
-                newAmount = state.collectedBlocks[blockGoal.blockType];
-            }
-            else
-            {
-                var blockerGoal = currentGoal as CollectBlockerGoal;
-                if (blockerGoal != null)
-                {
-                    newAmount = state.collectedBlockers[blockerGoal.blockerType];
-                }
-            }
-
-            if (newAmount == currentAmount)
-            {
-                return;
-            }
-
-            currentAmount = newAmount;
-            if (currentAmount >= targetAmount)
-            {
-                currentAmount = targetAmount;
-                SetCompletedTick(true);
-                SoundManager.instance.PlaySound("ReachedGoal");
-            }
-            amountText.text = (targetAmount - currentAmount).ToString();
-            if (amountText.gameObject.activeSelf)
-            {
-                amountText.GetComponent<Animator>().SetTrigger("GoalAchieved");
-            }
+           
         }
 
         /// <summary>

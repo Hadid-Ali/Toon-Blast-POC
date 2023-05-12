@@ -64,9 +64,9 @@ namespace GameVanilla.Game.Popups
         }
 
         /// <summary>
-        /// Sets the number of stars obtained in the level.
+        /// Sets the number of stars obtained in the LevelData.
         /// </summary>
-        /// <param name="stars">The number of stars obtained in the level.</param>
+        /// <param name="stars">The number of stars obtained in the LevelData.</param>
         public void SetStars(int stars)
         {
             if (stars == 0)

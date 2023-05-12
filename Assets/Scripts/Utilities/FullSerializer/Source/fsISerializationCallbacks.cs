@@ -24,7 +24,7 @@ namespace FullSerializer {
         /// Called after serialization.
         /// </summary>
         /// <param name="storageType">
-        /// The field/property type that is storing the instance.
+        /// The field/property type that is storing the Instance.
         /// </param>
         /// <param name="data">The data that was serialized.</param>
         void OnAfterSerialize(Type storageType, ref fsData data);
@@ -33,7 +33,7 @@ namespace FullSerializer {
         /// Called before deserialization.
         /// </summary>
         /// <param name="storageType">
-        /// The field/property type that is storing the instance.
+        /// The field/property type that is storing the Instance.
         /// </param>
         /// <param name="data">
         /// The data that will be used for deserialization.
@@ -44,9 +44,9 @@ namespace FullSerializer {
         /// Called after deserialization.
         /// </summary>
         /// <param name="storageType">
-        /// The field/property type that is storing the instance.
+        /// The field/property type that is storing the Instance.
         /// </param>
-        /// <param name="instance">The type of the instance.</param>
+        /// <param name="instance">The type of the Instance.</param>
         void OnAfterDeserialize(Type storageType);
     }
 }
@@ -71,7 +71,7 @@ namespace FullSerializer.Internal {
 
         public override void OnBeforeDeserializeAfterInstanceCreation(Type storageType, object instance, ref fsData data) {
             if (instance is fsISerializationCallbacks == false) {
-                throw new InvalidCastException("Please ensure the converter for " + storageType + " actually returns an instance of it, not an instance of " + instance.GetType());
+                throw new InvalidCastException("Please ensure the converter for " + storageType + " actually returns an Instance of it, not an Instance of " + instance.GetType());
             }
 
             ((fsISerializationCallbacks)instance).OnBeforeDeserialize(storageType, ref data);

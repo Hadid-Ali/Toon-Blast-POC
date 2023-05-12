@@ -25,7 +25,6 @@ namespace GameVanilla.Game.Popups
         /// </summary>
         public void OnExitButtonPressed()
         {
-            PuzzleMatchManager.instance.livesSystem.RemoveLife();
             GetComponent<SceneTransition>().PerformTransition();
         }
 

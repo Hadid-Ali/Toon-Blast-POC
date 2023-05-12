@@ -13,8 +13,8 @@ using GameVanilla.Core;
 namespace GameVanilla.Game.Popups
 {
     /// <summary>
-    /// This class contains the logic associated to the level regeneration popup that appears when there are
-    /// no possible matches on a level.
+    /// This class contains the logic associated to the LevelData regeneration popup that appears when there are
+    /// no possible matches on a LevelData.
     /// </summary>
 	public class RegenLevelPopup : Popup
     {
@@ -50,11 +50,11 @@ namespace GameVanilla.Game.Popups
 	    {
 		    for (var i = 0; i < 100; i++)
 		    {
-			    text.text = "Regenerating level.";
+			    text.text = "Regenerating LevelData.";
 			    yield return new WaitForSeconds(0.4f);
-			    text.text = "Regenerating level..";
+			    text.text = "Regenerating LevelData..";
 			    yield return new WaitForSeconds(0.4f);
-			    text.text = "Regenerating level...";
+			    text.text = "Regenerating LevelData...";
 			    yield return new WaitForSeconds(0.4f);
 		    }
 	    }

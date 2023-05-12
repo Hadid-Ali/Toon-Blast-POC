@@ -108,7 +108,6 @@ namespace GameVanilla.Game.Popups
         /// </summary>
         public void OnResetProgressButtonPressed()
         {
-            PuzzleMatchManager.instance.lastSelectedLevel = 0;
             PlayerPrefs.SetInt("next_level", 0);
             for (var i = 1; i <= 30; i++)
             {

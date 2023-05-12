@@ -20,19 +20,19 @@ namespace FullSerializer {
         public fsSerializer Serializer;
 
         /// <summary>
-        /// Construct an object instance that will be passed to TryDeserialize.
+        /// Construct an object Instance that will be passed to TryDeserialize.
         /// This should **not** deserialize the object.
         /// </summary>
         /// <param name="data">The data the object was serialized with.</param>
         /// <param name="storageType">
-        /// The field/property type that is storing the instance.
+        /// The field/property type that is storing the Instance.
         /// </param>
-        /// <returns>An object instance</returns>
+        /// <returns>An object Instance</returns>
         public virtual object CreateInstance(fsData data, Type storageType) {
             if (RequestCycleSupport(storageType)) {
                 throw new InvalidOperationException("Please override CreateInstance for " +
                     GetType().FullName + "; the object graph for " + storageType +
-                    " can contain potentially contain cycles, so separated instance creation " +
+                    " can contain potentially contain cycles, so separated Instance creation " +
                     "is needed");
             }
 
@@ -69,24 +69,24 @@ namespace FullSerializer {
         /// Serialize the actual object into the given data storage.
         /// </summary>
         /// <param name="instance">
-        /// The object instance to serialize. This will never be null.
+        /// The object Instance to serialize. This will never be null.
         /// </param>
         /// <param name="serialized">The serialized state.</param>
         /// <param name="storageType">
-        /// The field/property type that is storing this instance.
+        /// The field/property type that is storing this Instance.
         /// </param>
         /// <returns>If serialization was successful.</returns>
         public abstract fsResult TrySerialize(object instance, out fsData serialized, Type storageType);
 
         /// <summary>
-        /// Deserialize data into the object instance.
+        /// Deserialize data into the object Instance.
         /// </summary>
         /// <param name="data">Serialization data to deserialize from.</param>
         /// <param name="instance">
-        /// The object instance to deserialize into.
+        /// The object Instance to deserialize into.
         /// </param>
         /// <param name="storageType">
-        /// The field/property type that is storing the instance.
+        /// The field/property type that is storing the Instance.
         /// </param>
         /// <returns>
         /// True if serialization was successful, false otherwise.

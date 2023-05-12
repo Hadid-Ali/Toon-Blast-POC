@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace FullSerializer {
     /// <summary>
-    /// The actual type that a JsonData instance can store.
+    /// The actual type that a JsonData Instance can store.
     /// </summary>
     public enum fsDataType {
         Array,
@@ -31,56 +31,56 @@ namespace FullSerializer {
 
         #region Constructors
         /// <summary>
-        /// Creates a fsData instance that holds null.
+        /// Creates a fsData Instance that holds null.
         /// </summary>
         public fsData() {
             _value = null;
         }
 
         /// <summary>
-        /// Creates a fsData instance that holds a boolean.
+        /// Creates a fsData Instance that holds a boolean.
         /// </summary>
         public fsData(bool boolean) {
             _value = boolean;
         }
 
         /// <summary>
-        /// Creates a fsData instance that holds a double.
+        /// Creates a fsData Instance that holds a double.
         /// </summary>
         public fsData(double f) {
             _value = f;
         }
 
         /// <summary>
-        /// Creates a new fsData instance that holds an integer.
+        /// Creates a new fsData Instance that holds an integer.
         /// </summary>
         public fsData(Int64 i) {
             _value = i;
         }
 
         /// <summary>
-        /// Creates a fsData instance that holds a string.
+        /// Creates a fsData Instance that holds a string.
         /// </summary>
         public fsData(string str) {
             _value = str;
         }
 
         /// <summary>
-        /// Creates a fsData instance that holds a dictionary of values.
+        /// Creates a fsData Instance that holds a dictionary of values.
         /// </summary>
         public fsData(Dictionary<string, fsData> dict) {
             _value = dict;
         }
 
         /// <summary>
-        /// Creates a fsData instance that holds a list of values.
+        /// Creates a fsData Instance that holds a list of values.
         /// </summary>
         public fsData(List<fsData> list) {
             _value = list;
         }
 
         /// <summary>
-        /// Helper method to create a fsData instance that holds a dictionary.
+        /// Helper method to create a fsData Instance that holds a dictionary.
         /// </summary>
         public static fsData CreateDictionary() {
             return new fsData(new Dictionary<string, fsData>(
@@ -88,14 +88,14 @@ namespace FullSerializer {
         }
 
         /// <summary>
-        /// Helper method to create a fsData instance that holds a list.
+        /// Helper method to create a fsData Instance that holds a list.
         /// </summary>
         public static fsData CreateList() {
             return new fsData(new List<fsData>());
         }
 
         /// <summary>
-        /// Helper method to create a fsData instance that holds a list with the
+        /// Helper method to create a fsData Instance that holds a list with the
         /// initial capacity.
         /// </summary>
         public static fsData CreateList(int capacity) {
@@ -109,14 +109,14 @@ namespace FullSerializer {
 
         #region Internal Helper Methods
         /// <summary>
-        /// Transforms the internal fsData instance into a dictionary.
+        /// Transforms the internal fsData Instance into a dictionary.
         /// </summary>
         internal void BecomeDictionary() {
             _value = new Dictionary<string, fsData>();
         }
 
         /// <summary>
-        /// Returns a shallow clone of this data instance.
+        /// Returns a shallow clone of this data Instance.
         /// </summary>
         internal fsData Clone() {
             var clone = new fsData();
@@ -141,7 +141,7 @@ namespace FullSerializer {
         }
 
         /// <summary>
-        /// Returns true if this fsData instance maps back to null.
+        /// Returns true if this fsData Instance maps back to null.
         /// </summary>
         public bool IsNull {
             get {
@@ -150,7 +150,7 @@ namespace FullSerializer {
         }
 
         /// <summary>
-        /// Returns true if this fsData instance maps back to a double.
+        /// Returns true if this fsData Instance maps back to a double.
         /// </summary>
         public bool IsDouble {
             get {
@@ -159,7 +159,7 @@ namespace FullSerializer {
         }
 
         /// <summary>
-        /// Returns true if this fsData instance maps back to an Int64.
+        /// Returns true if this fsData Instance maps back to an Int64.
         /// </summary>
         public bool IsInt64 {
             get {
@@ -168,7 +168,7 @@ namespace FullSerializer {
         }
 
         /// <summary>
-        /// Returns true if this fsData instance maps back to a boolean.
+        /// Returns true if this fsData Instance maps back to a boolean.
         /// </summary>
         public bool IsBool {
             get {
@@ -177,7 +177,7 @@ namespace FullSerializer {
         }
 
         /// <summary>
-        /// Returns true if this fsData instance maps back to a string.
+        /// Returns true if this fsData Instance maps back to a string.
         /// </summary>
         public bool IsString {
             get {
@@ -186,7 +186,7 @@ namespace FullSerializer {
         }
 
         /// <summary>
-        /// Returns true if this fsData instance maps back to a Dictionary.
+        /// Returns true if this fsData Instance maps back to a Dictionary.
         /// </summary>
         public bool IsDictionary {
             get {
@@ -195,7 +195,7 @@ namespace FullSerializer {
         }
 
         /// <summary>
-        /// Returns true if this fsData instance maps back to a List.
+        /// Returns true if this fsData Instance maps back to a List.
         /// </summary>
         public bool IsList {
             get {
@@ -364,7 +364,7 @@ namespace FullSerializer {
         /// Returns true iff a == b.
         /// </summary>
         public static bool operator ==(fsData a, fsData b) {
-            // If both are null, or both are same instance, return true.
+            // If both are null, or both are same Instance, return true.
             if (ReferenceEquals(a, b)) {
                 return true;
             }
@@ -389,10 +389,10 @@ namespace FullSerializer {
         }
 
         /// <summary>
-        /// Returns a hash code for this instance.
+        /// Returns a hash code for this Instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms
+        /// A hash code for this Instance, suitable for use in hashing algorithms
         /// and data structures like a hash table.
         /// </returns>
         public override int GetHashCode() {

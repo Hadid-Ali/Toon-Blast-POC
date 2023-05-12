@@ -9,7 +9,7 @@ using UnityEngine.UI;
 namespace GameVanilla.Game.UI
 {
     /// <summary>
-    /// This class manages the player avatar that is displayed on the level scene.
+    /// This class manages the player avatar that is displayed on the LevelData scene.
     /// </summary>
     public class LevelAvatar : MonoBehaviour
     {

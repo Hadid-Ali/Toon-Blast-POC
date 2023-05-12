@@ -32,9 +32,9 @@ namespace GameVanilla.Core
         }
 
         /// <summary>
-        /// Loads the specified level.
+        /// Loads the specified LevelData.
         /// </summary>
-        /// <param name="level">The name of the level to load.</param>
+        /// <param name="level">The name of the LevelData to load.</param>
         /// <param name="duration">The duration of the fade.</param>
         /// <param name="fadeColor">The color of the fade.</param>
         public static void LoadLevel(string level, float duration, Color fadeColor)
@@ -47,9 +47,9 @@ namespace GameVanilla.Core
         }
 
         /// <summary>
-        /// Starts the fade to the new level.
+        /// Starts the fade to the new LevelData.
         /// </summary>
-        /// <param name="level">The name of the level to load.</param>
+        /// <param name="level">The name of the LevelData to load.</param>
         /// <param name="duration">The duration of the fade.</param>
         /// <param name="fadeColor">The color of the fade.</param>
         private void StartFade(string level, float duration, Color fadeColor)
@@ -60,7 +60,7 @@ namespace GameVanilla.Core
         /// <summary>
         /// This coroutine performs the actual work of fading out of the current scene and into the new scene.
         /// </summary>
-        /// <param name="level">The name of the level to load.</param>
+        /// <param name="level">The name of the LevelData to load.</param>
         /// <param name="duration">The duration of the fade.</param>
         /// <param name="fadeColor">The color of the fade.</param>
         /// <returns></returns>
