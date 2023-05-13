@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using GameVanilla.Core;
-using GameVanilla.Game.Scenes;
 
 public class Bomb : Booster
 {
@@ -140,7 +139,7 @@ public class Bomb : Booster
             ShowFx(gamePools, scene, x, y, direction);
         }
 
-        SoundManager.instance.PlaySound("Bomb");
+        SoundManager.Instance.PlaySound("Bomb");
     }
 
     /// <summary>

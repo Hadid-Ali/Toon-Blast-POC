@@ -1,147 +1,90 @@
-// Copyright (C) 2017-2020 gamevanilla. All rights reserved.
-// This code can only be used under the standard Unity Asset Store End User License Agreement,
-// a copy of which is available at http://unity3d.com/company/legal/as_terms.
-
 using System.Collections.Generic;
-
 using UnityEngine;
 
-namespace GameVanilla.Core
+public class SoundManager : MonoBehaviourSingleton<SoundManager>
 {
-    /// <summary>
-    /// This class is the entry point to the sound management of the game.
-    /// </summary>
-    public class SoundManager : MonoBehaviour
+    public List<AudioClip> sounds;
+    private ObjectPool soundPool;
+    private readonly Dictionary<string, AudioClip> nameToSound = new Dictionary<string, AudioClip>();
+
+    private BackgroundMusic bgMusic;
+
+    protected override void SingletonAwake()
     {
-        public List<AudioClip> sounds;
-        public static SoundManager instance;
+        base.SingletonAwake();
+        soundPool = GetComponent<ObjectPool>();
+    }
 
-        private ObjectPool soundPool;
-        private readonly Dictionary<string, AudioClip> nameToSound = new Dictionary<string, AudioClip>();
-
-        private BackgroundMusic bgMusic;
-
-        /// <summary>
-        /// Unity's Awake method.
-        /// </summary>
-        private void Awake()
+    private void Start()
+    {
+        foreach (var sound in sounds)
         {
-            if (instance != null)
-            {
-                Destroy(gameObject);
-                return;
-            }
-            instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            soundPool = GetComponent<ObjectPool>();
+            nameToSound.Add(sound.name, sound);
         }
 
-        /// <summary>
-        /// Unity's Start method.
-        /// </summary>
-        private void Start()
+        bgMusic = GameObject.Find("BackgroundMusic").GetComponent<BackgroundMusic>();
+    }
+    
+    public void AddSounds(List<AudioClip> soundsToAdd)
+    {
+        foreach (var sound in soundsToAdd)
         {
-            foreach (var sound in sounds)
-            {
-                nameToSound.Add(sound.name, sound);
-            }
-            bgMusic = GameObject.Find("BackgroundMusic").GetComponent<BackgroundMusic>();
+            nameToSound.Add(sound.name, sound);
+        }
+    }
+
+    public void RemoveSounds(List<AudioClip> soundsToAdd)
+    {
+        foreach (var sound in soundsToAdd)
+        {
+            nameToSound.Remove(sound.name);
+        }
+    }
+
+    public void PlaySound(AudioClip clip, bool loop = false)
+    {
+        var sound = PlayerPrefs.GetInt("sound_enabled");
+        if (sound != 1)
+        {
+            return;
         }
 
-        /// <summary>
-        /// Adds the specified list of sounds to the system.
-        /// </summary>
-        /// <param name="soundsToAdd">The sounds to add to the system.</param>
-        public void AddSounds(List<AudioClip> soundsToAdd)
+        if (clip != null)
         {
-            foreach (var sound in soundsToAdd)
-            {
-                nameToSound.Add(sound.name, sound);
-            }
+            soundPool.GetObject().GetComponent<SoundFx>().Play(clip, loop);
         }
+    }
 
-        /// <summary>
-        /// Removes the specified list of sounds from the system.
-        /// </summary>
-        /// <param name="soundsToAdd">The sounds to remove from the system.</param>
-        public void RemoveSounds(List<AudioClip> soundsToAdd)
+    public void PlaySound(string soundName, bool loop = false)
+    {
+        var clip = nameToSound[soundName];
+        if (clip != null)
         {
-            foreach (var sound in soundsToAdd)
-            {
-                nameToSound.Remove(sound.name);
-            }
+            PlaySound(clip, loop);
         }
+    }
 
-        /// <summary>
-        /// Plays the specified audio clip.
-        /// </summary>
-        /// <param name="clip">The audio clip to play.</param>
-        /// <param name="loop">True if the clip should be looped; false otherwise.</param>
-        public void PlaySound(AudioClip clip, bool loop = false)
-        {
-            var sound = PlayerPrefs.GetInt("sound_enabled");
-            if (sound != 1)
-            {
-                return;
-            }
+    public void SetSoundEnabled(bool soundEnabled)
+    {
+        PlayerPrefs.SetInt("sound_enabled", soundEnabled ? 1 : 0);
+    }
 
-            if (clip != null)
-            {
-                soundPool.GetObject().GetComponent<SoundFx>().Play(clip, loop);
-            }
-        }
+    public void SetMusicEnabled(bool musicEnabled)
+    {
+        PlayerPrefs.SetInt("music_enabled", musicEnabled ? 1 : 0);
+        bgMusic.GetComponent<AudioSource>().mute = !musicEnabled;
+    }
 
-        /// <summary>
-        /// Plays the sound with the specified name.
-        /// </summary>
-        /// <param name="soundName">The name of the sound to play.</param>
-        /// <param name="loop">True if the sound should be looped; false otherwise.</param>
-        public void PlaySound(string soundName, bool loop = false)
-        {
-            var clip = nameToSound[soundName];
-            if (clip != null)
-            {
-                PlaySound(clip, loop);
-            }
-        }
-
-        /// <summary>
-        /// Sets the sound as enabled/disabled.
-        /// </summary>
-        /// <param name="soundEnabled">True if the sound should be enabled; false otherwise.</param>
-        public void SetSoundEnabled(bool soundEnabled)
-        {
-            PlayerPrefs.SetInt("sound_enabled", soundEnabled ? 1 : 0);
-        }
-
-        /// <summary>
-        /// Sets the music as enabled/disabled.
-        /// </summary>
-        /// <param name="musicEnabled">True if the music should be enabled; false otherwise.</param>
-        public void SetMusicEnabled(bool musicEnabled)
-        {
-            PlayerPrefs.SetInt("music_enabled", musicEnabled ? 1 : 0);
-            bgMusic.GetComponent<AudioSource>().mute = !musicEnabled;
-        }
-
-        /// <summary>
-        /// Toggles the sound.
-        /// </summary>
-        public void ToggleSound()
-        {
-            var sound = PlayerPrefs.GetInt("sound_enabled");
-            PlayerPrefs.SetInt("sound_enabled", 1 - sound);
-        }
-
-        /// <summary>
-        /// Toggles the music.
-        /// </summary>
-        public void ToggleMusic()
-        {
-            var music = PlayerPrefs.GetInt("music_enabled");
-            PlayerPrefs.SetInt("music_enabled", 1 - music);
-            bgMusic.GetComponent<AudioSource>().mute = (1 - music) == 0;
-        }
+    public void ToggleSound()
+    {
+        var sound = PlayerPrefs.GetInt("sound_enabled");
+        PlayerPrefs.SetInt("sound_enabled", 1 - sound);
+    }
+    
+    public void ToggleMusic()
+    {
+        var music = PlayerPrefs.GetInt("music_enabled");
+        PlayerPrefs.SetInt("music_enabled", 1 - music);
+        bgMusic.GetComponent<AudioSource>().mute = (1 - music) == 0;
     }
 }

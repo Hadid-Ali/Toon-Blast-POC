@@ -1,8 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using GameVanilla.Core;
-using GameVanilla.Game.Scenes;
-
 public class Dynamite : Booster
 {
     public override List<GameObject> Resolve(GameScene scene, int idx)
@@ -65,7 +62,7 @@ public class Dynamite : Booster
             child.Play();
         }
 
-        SoundManager.instance.PlaySound("Dynamite");
+        SoundManager.Instance.PlaySound("Dynamite");
     }
 
     /// <summary>

@@ -17,7 +17,7 @@ namespace GameVanilla.Core
         /// <param name="soundName">The name of the sound to play.</param>
         public void Play(string soundName)
         {
-            SoundManager.instance.PlaySound(soundName);
+            SoundManager.Instance.PlaySound(soundName);
         }
     }
 }

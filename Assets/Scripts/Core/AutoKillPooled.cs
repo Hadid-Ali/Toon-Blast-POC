@@ -1,48 +1,28 @@
-// Copyright (C) 2017-2020 gamevanilla. All rights reserved.
-// This code can only be used under the standard Unity Asset Store End User License Agreement,
-// a copy of which is available at http://unity3d.com/company/legal/as_terms.
-
 using UnityEngine;
 
-namespace GameVanilla.Core
+public class AutoKillPooled : MonoBehaviour
 {
-    /// <summary>
-    /// This class automatically returns the associated pooled object to its origin pool after a certain amount of
-    /// time has passed.
-    /// </summary>
-    public class AutoKillPooled : MonoBehaviour
+    public float time = 2.0f;
+
+    private PooledObject pooledObject;
+    private float accTime;
+
+    private void OnEnable()
     {
-        public float time = 2.0f;
+        accTime = 0.0f;
+    }
 
-        private PooledObject pooledObject;
-        private float accTime;
+    private void Start()
+    {
+        pooledObject = GetComponent<PooledObject>();
+    }
 
-        /// <summary>
-        /// Unity's OnEnable method.
-        /// </summary>
-        private void OnEnable()
+    private void Update()
+    {
+        accTime += Time.deltaTime;
+        if (accTime >= time)
         {
-            accTime = 0.0f;
-        }
-
-        /// <summary>
-        /// Unity's Start method.
-        /// </summary>
-        private void Start()
-        {
-            pooledObject = GetComponent<PooledObject>();
-        }
-
-        /// <summary>
-        /// Unity's Update method.
-        /// </summary>
-        private void Update()
-        {
-            accTime += Time.deltaTime;
-            if (accTime >= time)
-            {
-                pooledObject.pool.ReturnObject(gameObject);
-            }
+            pooledObject.pool.ReturnObject(gameObject);
         }
     }
 }

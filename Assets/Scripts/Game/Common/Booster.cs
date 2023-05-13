@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using GameVanilla.Game.Scenes;
+﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class Booster : TileEntity
 {

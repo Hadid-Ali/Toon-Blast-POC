@@ -1,7 +1,4 @@
 using System.Collections.Generic;
-using GameVanilla.Core;
-using GameVanilla.Game.Common;
-using GameVanilla.Game.Scenes;
 using UnityEngine;
 
 public class ColorBomb : Booster
@@ -130,7 +127,7 @@ public class ColorBomb : Booster
             child.Play();
         }
 
-        SoundManager.instance.PlaySound("ColorBomb");
+        SoundManager.Instance.PlaySound("ColorBomb");
     }
 
     protected bool GetCombo(GameScene scene, int x, int y)
