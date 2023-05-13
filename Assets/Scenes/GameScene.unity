@@ -2301,7 +2301,6 @@ MonoBehaviour:
   limitTitleText: {fileID: 852131994}
   limitText: {fileID: 45710664}
   scoreText: {fileID: 1144356553}
-  progressBar: {fileID: 382363043}
   goalUi: {fileID: 1814962712}
   goalHeadline: {fileID: 2085225209}
   scoreGoalHeadline: {fileID: 1393018890}
@@ -3223,7 +3222,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1470173270
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4618,7 +4617,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 922f06e3c18c3f645b514ce7c2638c7d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canvas: {fileID: 199659004}
   gamePools: {fileID: 1694107006}
   gameUi: {fileID: 1171943748}
   goalPrefab: {fileID: 1693676191050156, guid: a67d4dbd1dc71d8438e8d909b3874dd3, type: 3}
@@ -4641,6 +4639,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 49ecefd59e5c44fdeb6fca40d80587bb, type: 3}
   - {fileID: 8300000, guid: c7ff4a0e8df174bb1bcc0276c7026eb7, type: 3}
   - {fileID: 8300000, guid: 06ef446f152d64c41ac05666ab3aa388, type: 3}
+  canvas: {fileID: 199659004}
   LevelData: {fileID: 0}
   tileEntities: []
   tilePositions: []
